@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:sftp="http://www.mulesoft.org/schema/mule/sftp"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:salesforce="http://www.mulesoft.org/schema/mule/salesforce" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/salesforce http://www.mulesoft.org/schema/mule/salesforce/current/mule-salesforce.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/sftp http://www.mulesoft.org/schema/mule/sftp/current/mule-sftp.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="cc672c91-b9a1-49fe-aa5e-3abe0b449f3a" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<salesforce:sfdc-config name="Salesforce_Config" doc:name="Salesforce Config" doc:id="05bcc62e-1fe2-4179-b942-e42308eef6b6" >
+		<salesforce:cached-basic-connection username="apathan@vam.com" password="Sfdc@Mule4" securityToken="VIR58PlfYv6W0KQTNfYscMlHV" />
+	</salesforce:sfdc-config>
+	<file:config name="File_Config" doc:name="File Config" doc:id="44266299-6477-4de7-b14e-9a7cb34ac44a" >
+		<file:connection workingDir="C:\Afroj Pathan\Mule4\accountsReports" />
+	</file:config>
+	<flow name="munitdemoFlow" doc:id="e0828bb7-2db7-4bf5-a61e-f6116326fc6a" >
+		<http:listener doc:name="GET /sfdc" doc:id="8f018098-5fbd-49b9-93d5-144c54549152" config-ref="HTTP_Listener_config" path="/sfdc"/>
+		<salesforce:query doc:name="Account" doc:id="29dea9f5-605c-4d41-b888-02124a66c25e" config-ref="Salesforce_Config">
+			<salesforce:salesforce-query >SELECT Name, LastModifiedDate, BillingPostalCode
+FROM Account</salesforce:salesforce-query>
+		</salesforce:query>
+		<ee:transform doc:name="Transform Message" doc:id="760ec878-2045-4eeb-89ad-8019b53dc437" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<flow-ref doc:name="Flow Reference" doc:id="13e1f7ae-af98-4e88-8555-f3d6ae06f888" name="accountsReports"/>
+		<logger level="INFO" doc:name="mainFlowLogger" doc:id="a2660b3e-d222-4bee-a2ac-1b22617eebb6" message="Accounts Report is complete, returened to Main Flow"/>
+	</flow>
+	<flow name="accountsReports" doc:id="b5c55c64-9173-4d9a-9e8c-259bce08bbd3" >
+		<file:write doc:name="WriteReports" doc:id="80fef433-ac4a-4c5c-84c8-ba97d39f2fcc" path="reports.csv" config-ref="File_Config"/>
+		<logger level="INFO" doc:name="subFlowLogger" doc:id="f667bc36-4cd5-49bc-823b-c566e7c24b7a" message="Report written successfully"/>
+	</flow>
+</mule>

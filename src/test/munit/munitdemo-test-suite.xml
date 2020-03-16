@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="munitdemo-test-suite.xml" />
+	<munit:before-suite name="munitdemo-test-suiteBefore_Suite" doc:id="f067165a-323f-42e7-94d7-1ebe529882f5" >
+		<logger level="INFO" doc:name="Logger" doc:id="cb899bfb-cde7-4b56-b347-cef78151dc37" message="BEFORE SUITE TEST"/>
+	</munit:before-suite>
+	<munit:before-test name="munitdemo-test-suiteBefore_Test" doc:id="a5733e92-7cd0-4efc-8c02-a84cd1a526d7" >
+		<logger level="INFO" doc:name="Logger" doc:id="d94d019d-baf8-4b5d-9e3b-2f992d708d19" message="BEFORE TEST "/>
+	</munit:before-test>
+	<munit:test name="munitdemo-test-suite-munitdemoFlowTest" doc:id="c419f985-6537-482f-8833-083f2d4324dc" description="Test">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock when" doc:id="ae4c7190-bf41-40a2-b133-3eb6cc244756" processor="salesforce:query">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="29dea9f5-605c-4d41-b888-02124a66c25e" attributeName="doc:id" />
+					<munit-tools:with-attribute whereValue="Salesforce_Config" attributeName="config-ref" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[output application/java
+---
+[
+{"LastModifiedDate": "2019-11-11T12:59:45.000Z",
+    "BillingPostalCode": null,
+    "Id": null,
+    "type": "Account",
+    "Name": " FROM MOCK WHEN/THEN RETURN- GenePoint"
+},
+{
+    "LastModifiedDate": "2019-11-11T12:59:45.000Z",
+    "BillingPostalCode": null,
+    "Id": null,
+    "type": "Account",
+    "Name": "FROM MOCK WHEN/THEN RETURN-United Oil &amp; Gas, UK"
+  }
+]
+]' mediaType="application/java" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<logger level="INFO" doc:name="Logger" doc:id="a11ab314-ffac-46b1-afa5-f6d98c152d72" message="LOGGER FROM BEHAVIOUR"/>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to munitdemoFlow" doc:id="58ea7f35-d19d-4f26-9318-08ce7f4cf59d" name="munitdemoFlow"/>
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:assert-that doc:name="Assert that" doc:id="36756325-f4e3-422b-9662-1991dd495449" is="#[MunitTools::notNullValue()]" message='#["PAYLOAD IS NULL"]' expression='#["PAYLOAD IS NOT NULL"]'/>
+		</munit:validation>
+	</munit:test>
+	<munit:after-test name="munitdemo-test-suiteAfter_Test" doc:id="36be0f41-a4ac-4c09-85cd-785a2b84004c" >
+		<logger level="INFO" doc:name="Logger" doc:id="681c0a82-f2a4-47da-a80b-b1f3cd4cc0f9" message="AFTER TEST"/>
+	</munit:after-test>
+	<munit:after-suite name="munitdemo-test-suiteAfter_Suite" doc:id="ee592384-0a82-4680-87ad-e71eb267cf9d" >
+		<logger level="INFO" doc:name="Logger" doc:id="1fa3f995-a7f8-422e-9b08-79d3e6e75b4c" message="AFTER SUITE"/>
+	</munit:after-suite>
+
+
+</mule>
